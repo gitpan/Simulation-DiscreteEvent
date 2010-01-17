@@ -9,31 +9,24 @@ use ok 'Simulation::DiscreteEvent::Server';
 my $invalid_object = {};
 
 {
-    package Test::Server;
-    use Moose;
-    with 'Simulation::DiscreteEvent::Server';
-    
-    sub type { 'Test Server' };
-    sub _dispatch {
-        my $self = shift;
-        my $event_type = shift;
-        if ($event_type eq 'start') {
-            return \&start;
-        }
-        if ($event_type eq 'stop') {
-            return \&stop;
-        }
-        return;
-    }
-    sub start { return 'Started' }
-    sub stop { return $_[1] }
+    package Test::DE::Server;
+    #use Moose;
+    #BEGIN { extends 'Simulation::DiscreteEvent::Server' };
+    use parent 'Simulation::DiscreteEvent::Server';
+ 
+    sub type { 'Test Server' }
+    sub start : Event(start) { return 'Started' }
+    sub finish : Hey : Event(stop) { return $_[1] }
+    sub junk : Junk(31) { 1 }
+    no Moose;
+    __PACKAGE__->meta->make_immutable;
 }
 
-my $server = Test::Server->new( 
+my $server = Test::DE::Server->new( 
     name => 'Server1',
 );
 
-isa_ok $server, 'Test::Server', 'server is created';
+isa_ok $server, 'Test::DE::Server', 'server is created';
 is $server->type, 'Test Server', 'server type is correct';
 is $server->handle('start', undef), 'Started', 'start event is handled correctly';
 is $server->handle('stop', 'Stopped'), 'Stopped', 'stop event is handled correctly';
