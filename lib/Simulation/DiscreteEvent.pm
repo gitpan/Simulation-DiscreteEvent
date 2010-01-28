@@ -5,7 +5,7 @@ use Module::Load;
 use Simulation::DiscreteEvent::Event;
 use namespace::clean -except => ['meta'];
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 NAME
 
@@ -18,8 +18,9 @@ Simulation::DiscreteEvent - module for discrete-event simulation
 =head1 DESCRIPTION
 
 This module implements library for discrete-event simulation. Currently it is
-in experimental state, everything is subject to change. Please see example of
-using this library for modelling M/M/1/0 system in t/simulation-MM10.t
+in experimental state, everything is subject to change. Please see examples of
+using this library in L<Simulation::DiscreteEvent::Cookbook> and in test
+t/simulation-MM10.t
 
 =head1 SUBROUTINES/METHODS
 
@@ -86,7 +87,10 @@ created object.
 sub add {
     my $self = shift;
     my $server_class = shift;
-    eval { load $server_class };
+    {
+        no strict 'refs';
+        load $server_class unless @{"${server_class}::ISA"};
+    }
     my $srv = $server_class->new( model => $self, @_ );
     push @{$self->servers}, $srv;
     return $srv;
@@ -106,6 +110,7 @@ sub run {
     while ( my $event = shift @{ $self->events } ) {
         if ( $stop_time && $stop_time < $event->time ) {
             unshift @{ $self->events }, $event;
+            $self->_time($stop_time);
             last;
         }
         $self->_time( $event->time );

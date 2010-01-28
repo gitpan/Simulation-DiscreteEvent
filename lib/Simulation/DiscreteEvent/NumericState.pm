@@ -1,7 +1,7 @@
 package Simulation::DiscreteEvent::NumericState;
 
 use Moose::Role;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 NAME
 
@@ -13,7 +13,7 @@ Add Simulation::DiscreteEvent::NumericState role to your server:
 
     package MyServer;
     use Moose;
-    use parent 'Simulation::DiscreteEvent::Server';
+    BEGIN { extends 'Simulation::DiscreteEvent::Server'; }
     with 'Simulation::DiscreteEvent::NumericState';
     sub handler1 : Event(start) {
         # handle start event here
