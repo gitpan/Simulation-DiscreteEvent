@@ -1,7 +1,7 @@
 package Simulation::DiscreteEvent::NumericState;
 
 use Moose::Role;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 NAME
 
@@ -84,6 +84,26 @@ sub state {
         return $self->_state($state);
     }
     $self->_state;
+}
+
+=head2 $self->state_inc
+
+Increases state by 1. Returns result state.
+
+=cut
+sub state_inc {
+    my $self = shift;
+    $self->state( $self->state + 1 );
+}
+
+=head2 $self->state_dec
+
+Decreases state by 1. Returns result state.
+
+=cut
+sub state_dec {
+    my $self = shift;
+    $self->state( $self->state - 1 );
 }
 
 =head2 $self->average_load
