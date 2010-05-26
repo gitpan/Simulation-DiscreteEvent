@@ -1,7 +1,7 @@
 package Simulation::DiscreteEvent::Generator;
 
 use Moose;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 BEGIN { extends 'Simulation::DiscreteEvent::Server' }
 use Carp;
 use namespace::clean -except => ['meta'];
@@ -86,8 +86,6 @@ has dest  => (is => 'rw', isa => 'Simulation::DiscreteEvent::Server');
 sub BUILD {
     my $self = shift;
     if ( defined $self->start_at ) {
-        croak "start_at argument should be non-negative number"
-          if $self->start_at < 0;
         $self->model->schedule( $self->start_at, $self, 'next' );
     }
 }
@@ -110,7 +108,6 @@ sub _next :Event(next) {
     }
 
     # schedule next event
-    croak "interval attribute is not defined!" unless $self->interval;
     $self->model->schedule( 
         $self->model->time + $self->interval->($self), $self, 'next' );
 }
